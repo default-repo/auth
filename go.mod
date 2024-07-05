@@ -1,3 +1,3 @@
-module std/hw1/auth
+module auth
 
 go 1.22
