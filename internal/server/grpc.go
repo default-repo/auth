@@ -22,7 +22,7 @@ func (s *GRPCServer) Create(_ context.Context, r *desc.CreateRequest) (*desc.Cre
 }
 
 func (s *GRPCServer) Get(_ context.Context, r *desc.GetRequest) (*desc.GetResponse, error) {
-	fmt.Printf("[ get ] request1: %+v\n", r)
+	fmt.Printf("[ get ] request: %+v\n", r)
 
 	admin := desc.Role_Admin
 
