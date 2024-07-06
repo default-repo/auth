@@ -28,7 +28,7 @@ message UserData {
 }
 
 message User {
-  int64 id = 1;
+  string uuid = 1;
   string name = 2;
   string email = 3;
   optional Role role = 4;
@@ -41,11 +41,11 @@ message CreateRequest {
 }
 
 message CreateResponse {
-  int64 id = 1;
+  string UUID = 1;
 }
 
 message GetRequest {
-  int64 id = 1;
+  string UUID = 1;
 }
 
 message GetResponse {
@@ -53,12 +53,12 @@ message GetResponse {
 }
 
 message UpdateRequest {
-  int64 id = 1;
+  string UUID = 1;
   string name = 2;
   string email = 3;
   Role role = 4;
 }
 
 message DeleteRequest {
-  int64 id = 1;
+  string UUID = 1;
 }
