@@ -1,11 +1,12 @@
 package main
 
 import (
+	"log"
+	"net"
+
 	"github.com/default-repo/auth/internal/server"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
-	"log"
-	"net"
 
 	desc "github.com/default-repo/auth/pkg/proto/auth_v1"
 )
