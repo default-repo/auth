@@ -5,10 +5,9 @@ import (
 	"net"
 
 	"github.com/default-repo/auth/internal/server"
+	desc "github.com/default-repo/auth/pkg/proto/auth_v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
-
-	desc "github.com/default-repo/auth/pkg/proto/auth_v1"
 )
 
 func main() {

@@ -41,11 +41,11 @@ message CreateRequest {
 }
 
 message CreateResponse {
-  string UUID = 1;
+  string uuid = 1;
 }
 
 message GetRequest {
-  string UUID = 1;
+  string uuid = 1;
 }
 
 message GetResponse {
@@ -53,12 +53,12 @@ message GetResponse {
 }
 
 message UpdateRequest {
-  string UUID = 1;
+  string uuid = 1;
   string name = 2;
   string email = 3;
   Role role = 4;
 }
 
 message DeleteRequest {
-  string UUID = 1;
+  string uuid = 1;
 }

@@ -4,9 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/golang/protobuf/ptypes/empty"
-
 	desc "github.com/default-repo/auth/pkg/proto/auth_v1"
+	"github.com/golang/protobuf/ptypes/empty"
 )
 
 // GRPCPort - this is the port on which the gRPC server is running
@@ -22,7 +21,7 @@ func (s *GRPCServer) Create(_ context.Context, r *desc.CreateRequest) (*desc.Cre
 	fmt.Printf("[ create ] request: %+v\n", r)
 
 	return &desc.CreateResponse{
-		UUID: "1d132bab-2e43-4fbc-bc46-3148076d07cc",
+		Uuid: "1d132bab-2e43-4fbc-bc46-3148076d07cc",
 	}, nil
 }
 

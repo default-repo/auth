@@ -28,4 +28,7 @@ generate-auth-api:
 	api/proto/auth_v1/auth.proto
 
 vendor:
-	go mod vendor && go mod tidy
+	go mod tidy && go mod vendor
+
+format:
+	goimports -w ./internal/ && goimports -w ./cmd/
