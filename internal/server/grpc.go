@@ -29,7 +29,7 @@ func (s *GRPCServer) Create(_ context.Context, r *desc.CreateRequest) (*desc.Cre
 func (s *GRPCServer) Get(_ context.Context, r *desc.GetRequest) (*desc.GetResponse, error) {
 	fmt.Printf("[ get ] request: %+v\n", r)
 
-	admin := desc.Role_Admin
+	admin := desc.Role_ADMIN
 
 	return &desc.GetResponse{
 		User: &desc.User{
