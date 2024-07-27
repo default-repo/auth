@@ -10,7 +10,6 @@ import (
 	"github.com/brianvoe/gofakeit"
 	"github.com/default-repo/auth/internal/model"
 	"github.com/default-repo/auth/internal/repository"
-	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
@@ -21,6 +20,7 @@ const (
 	customerTableName = "customer"
 
 	idColumn       = "id"
+	uuidColumn     = "uuid"
 	nameColumn     = "name"
 	passwordColumn = "password"
 	emailColumn    = "email"
@@ -37,19 +37,36 @@ func NewPGStore(log slog.Logger, dbDSN string) (*PGStore, error) {
 		return nil, errors.New("could not connect to database: " + err.Error())
 	}
 
+	if err = pool.Ping(context.Background()); err != nil {
+		return nil, errors.New("could not ping database: " + err.Error())
+	}
+
 	return &PGStore{
 		pool: pool,
 		log:  log,
 	}, nil
 }
+func (db *PGStore) Close() {
+	db.pool.Close()
+}
 
 func (db *PGStore) Somthing() error { return nil }
 
-func (db *PGStore) InsertData(ctx context.Context) (int, error) {
+func (db *PGStore) InsertData(ctx context.Context, c model.Customer) (int, error) {
 	builder := sq.Insert(customerTableName).
 		PlaceholderFormat(sq.Dollar).
-		Columns(nameColumn, passwordColumn, emailColumn).
-		Values(gofakeit.Name(), gofakeit.Password(true, true, true, true, true, 8), gofakeit.Email()).
+		Columns(
+			uuidColumn,
+			nameColumn,
+			passwordColumn,
+			emailColumn,
+		).
+		Values(
+			c.UUID,
+			c.Name,
+			c.Password,
+			c.Email,
+		).
 		Suffix("RETURNING id")
 
 	query, args, err := builder.ToSql()
@@ -67,7 +84,13 @@ func (db *PGStore) InsertData(ctx context.Context) (int, error) {
 }
 
 func (db *PGStore) List(ctx context.Context, limit uint64) (pgx.Rows, error) {
-	builder := sq.Select(idColumn, nameColumn, passwordColumn, emailColumn).
+	builder := sq.Select(
+		idColumn,
+		uuidColumn,
+		nameColumn,
+		passwordColumn,
+		emailColumn,
+	).
 		PlaceholderFormat(sq.Dollar).
 		From(customerTableName).
 		OrderBy("id DESC").
@@ -86,7 +109,7 @@ func (db *PGStore) List(ctx context.Context, limit uint64) (pgx.Rows, error) {
 	return rows, nil
 }
 
-func (db *PGStore) UpdateByID(ctc context.Context, ID int) (pgconn.CommandTag, error) {
+func (db *PGStore) UpdateByID(ctc context.Context, ID int) (int64, error) {
 	builder := sq.Update(customerTableName).
 		PlaceholderFormat(sq.Dollar).
 		Set("name", gofakeit.Name()).
@@ -94,25 +117,25 @@ func (db *PGStore) UpdateByID(ctc context.Context, ID int) (pgconn.CommandTag, e
 
 	query, args, err := builder.ToSql()
 	if err != nil {
-		return nil, fmt.Errorf("creating UpdateByID pg query failed: %w", err)
+		return 0, fmt.Errorf("creating UpdateByID pg query failed: %w", err)
 	}
 
 	result, err := db.pool.Exec(ctc, query, args...)
 	if err != nil {
-		return nil, fmt.Errorf("executing UpdateByID pg query failed: %w", err)
+		return 0, fmt.Errorf("executing UpdateByID pg query failed: %w", err)
 	}
 
-	return result, nil
+	return result.RowsAffected(), nil
 }
 
 func (db *PGStore) GetCustomerByUID(ctx context.Context, ID int) (*model.Customer, error) {
 	result := new(model.Customer)
 
-	stmt := fmt.Sprintf("SELECT id, name, email, password FROM %s WHERE id = $1", customerTableName)
+	stmt := fmt.Sprintf("SELECT id, uuid, name, email, password FROM %s WHERE id = $1", customerTableName)
 
 	row := db.pool.QueryRow(ctx, stmt, ID)
 
-	err := row.Scan(&result.ID, &result.Name, &result.Email, &result.Password)
+	err := row.Scan(&result.ID, &result.UUID, &result.Name, &result.Email, &result.Password)
 	if err != nil {
 		return nil, fmt.Errorf("scan GetByUID pg query failed: %w", err)
 	}

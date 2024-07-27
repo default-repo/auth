@@ -5,12 +5,7 @@ import (
 )
 
 func Load(path string) error {
-	err := godotenv.Load(path)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return godotenv.Load(path)
 }
 
 type GRPCConfig interface {

@@ -32,6 +32,20 @@ endif
 LOCAL_BIN:=$(CURDIR)/bin
 GOOSE := $(LOCAL_BIN)/goose
 
+# ---------------------- RUN -----------------------------
+
+run-local:
+ifeq ($(ENV), PROD)
+	@echo "Current ENV is PROD!" && exit 1
+endif
+	@echo "Started in development mode!" && go run cmd/auth/main.go -config-path=.env.local
+
+run-prod:
+ifeq ($(ENV), LOCAL)
+	@echo "Current ENV is LOCAL!" && exit 1
+endif
+	@echo "Started in production mode!" && go run cmd/auth/main.go -config-path=.env.prod
+
 # ---------------------- DB ------------------------------
 
 migration-gen:
@@ -84,9 +98,3 @@ vendor:
 
 format:
 	goimports -w ./internal/ && goimports -w ./cmd/
-
-run-local:
-	@echo "Running in development mode!" && go run cmd/auth/main.go -config-path=.env.local
-
-run-prod:
-	@echo "Running in production mode!" && go run cmd/auth/main.go -config-path=.env.prod

@@ -1,13 +1,11 @@
 package env
 
 import (
-	"errors"
+	"fmt"
 	"os"
 )
 
-const (
-	dsnEnvName = "PG_DSN"
-)
+const dsnEnvName = "PG_DSN"
 
 type PGConfig struct {
 	dsn string
@@ -16,7 +14,7 @@ type PGConfig struct {
 func NewPGConfig() (*PGConfig, error) {
 	dsn := os.Getenv(dsnEnvName)
 	if len(dsn) == 0 {
-		return nil, errors.New("environment variable `PG_DSN` is not set")
+		return nil, fmt.Errorf("environment variable %s is not set", dsnEnvName)
 	}
 
 	return &PGConfig{dsn: dsn}, nil

@@ -2,6 +2,7 @@
 create table customer
 (
     id         serial primary key,
+    uuid       text      not null,
     name       text      not null,
     password   text      not null,
     email      text      not null,

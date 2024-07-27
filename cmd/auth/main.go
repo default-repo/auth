@@ -5,6 +5,8 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/brianvoe/gofakeit"
+	"github.com/default-repo/auth/internal/model"
 	"log/slog"
 	"os"
 
@@ -75,7 +77,10 @@ func main() {
 		os.Exit(1)
 	}
 
-	defer grpcServer.S.Stop()
+	defer func() {
+		grpcServer.S.Stop()
+		db.Close()
+	}()
 
 	fmt.Printf("grpc server started on [ %s ]\n", grpcConfig.Address())
 
@@ -86,7 +91,14 @@ func main() {
 }
 
 func basicDBInteraction(ctx context.Context, db *pg_db.PGStore) error {
-	lastID, err := db.InsertData(ctx)
+	customer := model.Customer{
+		UUID:     gofakeit.UUID(),
+		Name:     gofakeit.Name(),
+		Password: gofakeit.Password(true, true, true, true, true, 8),
+		Email:    gofakeit.Email(),
+	}
+
+	lastID, err := db.InsertData(ctx, customer)
 	if err != nil {
 		return errors.New("inserting by ID failed: " + err.Error())
 	}
@@ -101,13 +113,13 @@ func basicDBInteraction(ctx context.Context, db *pg_db.PGStore) error {
 	fmt.Println("\nList of customers:")
 	for rows.Next() {
 		var id int
-		var name, password, email string
+		var name, uuid, password, email string
 
-		if err := rows.Scan(&id, &name, &password, &email); err != nil {
+		if err := rows.Scan(&id, &uuid, &name, &password, &email); err != nil {
 			return errors.New("scanning row failed: " + err.Error())
 		}
 
-		fmt.Printf("ID: %d, Name: %s, Password: %s, Email: %s\n", id, name, password, email)
+		fmt.Printf("ID: %d, UUID: %s, Name: %s, Password: %s, Email: %s\n", id, uuid, name, password, email)
 	}
 
 	result, err := db.UpdateByID(ctx, lastID)
@@ -115,17 +127,17 @@ func basicDBInteraction(ctx context.Context, db *pg_db.PGStore) error {
 		return errors.New("update by ID failed: " + err.Error())
 	}
 
-	if result.RowsAffected() > 0 {
-		fmt.Printf("\nSuccessfully rows updated: %d\n", result.RowsAffected())
+	if result > 0 {
+		fmt.Printf("\nSuccessfully rows updated: [ %d ]\n", result)
 	}
 
-	customer, err := db.GetCustomerByUID(ctx, lastID)
+	c, err := db.GetCustomerByUID(ctx, lastID)
 	if err != nil {
 
 		return errors.New("get by ID failed: " + err.Error())
 	}
 
-	fmt.Printf("\nLast created/updated customer: \nID: %d, Name: %s, Password: %s, Email: %s\n\n", customer.ID, customer.Name, customer.Password, customer.Email)
+	fmt.Printf("\nLast created/updated customer: \nID:\t%d\nName:\t%s\nPas.:\t%s\nEmail:\t%s\n\n", c.ID, c.Name, c.Password, c.Email)
 
 	return nil
 }

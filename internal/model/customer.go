@@ -4,6 +4,7 @@ import "time"
 
 type Customer struct {
 	ID        int64      `db:"id"`
+	UUID      string     `db:"uuid"`
 	Name      string     `db:"name"`
 	Password  string     `db:"password"`
 	Email     string     `db:"email"`
