@@ -5,10 +5,11 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"github.com/brianvoe/gofakeit"
-	"github.com/default-repo/auth/internal/model"
 	"log/slog"
 	"os"
+
+	"github.com/brianvoe/gofakeit"
+	"github.com/default-repo/auth/internal/model"
 
 	"github.com/default-repo/auth/internal/config"
 	"github.com/default-repo/auth/internal/config/env"
