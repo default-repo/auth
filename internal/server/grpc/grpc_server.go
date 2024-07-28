@@ -1,4 +1,4 @@
-package server
+package grpc
 
 import (
 	"context"
@@ -6,14 +6,28 @@ import (
 
 	desc "github.com/default-repo/auth/pkg/proto/auth_v1"
 	"github.com/golang/protobuf/ptypes/empty"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
-
-// GRPCPort - this is the port on which the gRPC server is running
-const GRPCPort = ":50051"
 
 // GRPCServer - structure for implementing .proto interface
 type GRPCServer struct {
 	desc.UnimplementedAuthV1Server
+}
+
+type Server struct {
+	S *grpc.Server
+}
+
+func NewGRPCServer() (*Server, error) {
+	s := grpc.NewServer()
+
+	reflection.Register(s)
+	desc.RegisterAuthV1Server(s, &GRPCServer{})
+
+	return &Server{
+		S: s,
+	}, nil
 }
 
 // Create - creates a new object based on a CreateRequest and returns a CreateResponse

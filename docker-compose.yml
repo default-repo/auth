@@ -1,0 +1,22 @@
+volumes:
+  postgres_volume_local:
+  postgres_volume_prod:
+
+services:
+  local-pg:
+    image: postgres:14-alpine3.17
+    env_file:
+      - ".env.local"
+    ports:
+      - "54321:5432"
+    volumes:
+      - postgres_volume_local:/var/lib/postgresql/data
+
+  prod-pg:
+    image: postgres:14-alpine3.17
+    env_file:
+      - ".env.prod"
+    ports:
+      - "54322:5432"
+    volumes:
+      - postgres_volume_prod:/var/lib/postgresql/data
