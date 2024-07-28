@@ -2,5 +2,4 @@
 bin
 vendor
 
-.env.local
-.env.prod
+.env.*
